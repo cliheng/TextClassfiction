@@ -42,7 +42,7 @@ def build_dataloader(dataset, tokenizer, batch_size=32):
 
 if __name__ == '__main__':
     # 创建模型
-    model = BertTextClassfication('junnyu/wobert_chinese_plus_base', num_labels=2)
+    model = BertTextClassfication('junnyu/wobert_chinese_plus_base', dropout_rate=0.2, num_labels=2)
     # 加载目录中的语料文件
     corpus = load_corpus('corpus')
     # 合并train.tsv, dev.tsv语料

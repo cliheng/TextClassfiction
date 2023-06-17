@@ -14,6 +14,7 @@ def convert_corpus(corpus_dir):
         item_path = os.path.join(corpus_dir, item)
         if os.path.isfile(item_path):
             df = pd.read_csv(item_path, sep=r'\t', engine='python')
+            # 文本分词
             df['text_a'] = df['text_a'].apply(lambda x: ' '.join(jieba.lcut(x)))
             save_path = os.path.join(os.path.dirname(__file__), os.path.splitext(item)[0] + '.txt')
             files.append(save_path)
@@ -28,15 +29,19 @@ if __name__ == '__main__':
     # 加载并转换目录中的语料文件
     files = convert_corpus('corpus')
     print(files)
-
-    model = fasttext.train_supervised(files[0])
-
-    for i, line in enumerate(open(files[-1])):
-        label,prob = model.predict(line.strip())
-        print(f'text:{ "".join(line.strip().split()) } \nlabel:{label}\nprob:{prob}')
-        if i > 5:
-            break
-    
+    # # 模型训练
+    # model = fasttext.train_supervised(files[-1])
+    model = fasttext.train_supervised(files[-1],lr=0.5, epoch=25, wordNgrams=2, bucket=200000, dim=50, loss='ova')
+    # # 模型保存
+    # model.save_model('text_classfication.mod')
+    # 模型加载
+    model = fasttext.load_model('text_classfication.mod')
+    # 模型推理
+    label,prob = model.predict('效果 很 一般')
+    print(f'text:{ "效果很一般" } \nlabel:{label}\nprob:{prob}')
+    # 模型测试
+    result = model.test(files[0], k=-1)
+    print(result)
 
 
     

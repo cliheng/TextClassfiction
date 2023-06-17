@@ -36,18 +36,3 @@ def generate_position_embedding(bert_model):
     hierarchical_position.weight.requires_grad = False
     return hierarchical_position
 
-def custom_local_bert(local, max_position=2048):
-    """
-    加载本地化缓存bert模型并定制最大输入长度
-    """
-    # model file
-    model_file = os.path.join(local, 'pytorch_model.bin')
-    # model config
-    config =custom_local_bert_config(local, max_position=max_position)
-    # load model 忽略模型权重大小不匹配的加载项
-    model = BertPreTrainedModel.from_pretrained(local, config=config, ignore_mismatched_sizes=True)
-    # 创建分层position embedding
-    hierarchical_embedding = generate_position_embedding(model_file)
-    # 新position embedding嵌入现有bert模型
-    model.embeddings.position_embeddings = hierarchical_embedding
-    return model
